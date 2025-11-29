@@ -1,6 +1,7 @@
 # PARTE 01
 # Questão A
 **Pergunta:** Qual/Quais API(s) você criaria para que receber esses dados? Justifique sua resposta.
+
 **Resposta:**
 Eu criaria uma única API (Endpoint) do tipo **POST** que aceita como corpo da requisição uma **lista (array JSON)** de objetos de medição. Algo assim:
 `POST /api/measurements`
@@ -9,6 +10,7 @@ Primeiro por eficiência de rede, já que o sensor acumula dados quando a rede e
 
 # Questão B
 **Pergunta:** Como você definiria o objeto de request dessa API no Asp.Net Core? (Exemplifique com código)
+
 **Resposta:**
 Eu definiria uma classe (DTO ou Model) representando a estrutura de um único registro de medição, utilizando os tipos de dados apropriados do C# para mapear os requisitos (Int32, String, DateTimeOffset, Decimal).
 
@@ -33,12 +35,14 @@ public async Task<IActionResult> Post([FromBody] List<MeasurementRequest> measur
 
 # Questão C
 **Pergunta:** Qual a melhor alternativa de banco de dados para esse cenário na sua opinião? Justifique sua resposta.
+
 **Resposta:**
 A melhor alternativa seria um Banco de Dados de Séries Temporais (TSDB), como o TimescaleDB (baseado no PostgreSQL) ou InfluxDB. Com base na natureza dos dados, o cenário trata de monitoramento contínuo, onde o dado mais importante é o valor medido associado a um carimbo de tempo (*timestamp*). TSDBs são otimizados exatamente para esse padrão de escrita intensa (append-only). Além disso, os sensores podem gerar grandes volumes de dados, e os TSDBs mantêm a performance de ingestão estável mesmo com bilhões de registros, enquanto bancos tradicionais podem sofrer com a indexação em tabelas grandes, o que garante a performance. Em termos gerais, para consultas analíticas de monitoramento, geralmente queremos saber médias, máximos, mínimos em janelas de tempo (ex: "média da temperatura na última hora"). TSDBs possuem funções nativas e otimizadas para essas agregações, sendo muito mais rápidos que SQL tradicional. Por fim, od TSDBs facilitam o descarte de dados antigos (retention policies) ou a compactação de dados históricos, o que é essencial para manter o custo de armazenamento controlado em sistemas de IoT, favorecendo o ciclo de vida dos dados.
 
 # PARTE 02
 # Questão A
 **Pergunta:** Uma API onde se possa vincular um Setor/Equipamento à um sensor; (Exemplifique com código)
+
 **Resposta:**
 Para vincular um Sensor a um Equipamento, criei um relacionamento no banco de dados (chave estrangeira) e um endpoint específico `POST /api/sensors/link` que recebe o código do sensor e o ID do equipamento.
 
@@ -83,6 +87,7 @@ public class LinkSensorRequest
 
 # Questão B
 **Pergunta:** Uma API onde ao informar o Id de um Setor/Equipamento traga as últimas 10 medições de cada sensor vinculado a ele; (Exemplifique com código)
+
 **Resposta:**
 Implementei um endpoint `GET /api/equipments/{id}/measurements` que busca o equipamento, lista seus sensores e, para cada um, recupera as 10 medições mais recentes.
 
@@ -145,6 +150,7 @@ public async Task<ActionResult<EquipmentMeasurementsDto>> GetEquipmentMeasuremen
 # PARTE 03
 # Questão A
 **Pergunta:** Qual seria a sua proposta para resolver esse problema? Quais tecnologias você optaria por usar para resolver esse problema? Justifique sua resposta.
+
 **Resposta:**
 Minha proposta é utilizar uma Arquitetura Orientada a Eventos (Event-Driven Architecture) com processamento assíncrono em segundo plano. O fluxo de dados seria:
 1.  Ingestão: A API recebe as medições e as persiste no banco de dados (como já implementado).
@@ -163,6 +169,7 @@ A principal razão das minhas escolhas é a Performance e Escalabilidade. Calcul
 
 # Questão B
 **Pergunta:** Implemente o algoritmo necessário para resolver esse problema. (Exemplifique com código)
+
 **Resposta:**
 Implementei um serviço `AlertService` que encapsula a lógica de verificação das regras.
 Serviço (AlertService.cs):
@@ -210,6 +217,7 @@ public class AlertService
 
 # Questão C
 **Pergunta:** Crie testes unitários com os cenários de testes que você acredita serem necessários para validar sua solução.
+
 **Resposta:**
 Criei um projeto de testes `IotMonitoringApi.Tests` utilizando xUnit para validar os cenários.
 Cenários Testados:
@@ -247,6 +255,7 @@ public void CheckAlerts_ShouldReturnAttention_WhenAverageIsWithinLowMargin()
 
 # PARTE 04
 **Pergunta:** Após implementar o sistema em um cliente de grande porte... o sistema estava gerando um atraso na leitura e no processamento dos dados recebidos pelos sensores. Qual(ais) solução(ões) você indicaria para resolver esse problema?
+
 **Resposta:**
 Para resolver o problema de latência e gargalo no processamento devido ao alto volume de dados, indicaria as seguintes soluções escaláveis:
 1.  Uso de Mensageria (Message Broker) de Alta Performance:
