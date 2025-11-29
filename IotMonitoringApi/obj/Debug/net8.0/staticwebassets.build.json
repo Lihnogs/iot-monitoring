@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "6x730riMTrx/BwB2RPjY/qNRz1Ahpoeh3YRybswe/vw=",
+  "Source": "IotMonitoringApi",
+  "BasePath": "_content/IotMonitoringApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
